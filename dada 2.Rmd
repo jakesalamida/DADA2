@@ -1,0 +1,142 @@
+---
+title: "DADA2"
+author: "Jake Salamida"
+date: "11/13/2020"
+output: html_document
+---
+
+```{r}
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install("dada2", version = "3.10")
+#BiocManager::install("ShortRead")
+
+```
+
+```{r}
+library(tidyverse)
+library(dada2)
+library(ShortRead)
+
+```
+
+```{r}
+path <- "~/144l_students/Input_Data/week5/EEMB144L_2018_fastq/"
+
+fnFs <- list.files(path, pattern = "_R1_001.fastq", full.names = TRUE)
+
+fnRs <- list.files(path, pattern = "_R2_001.fastq", full.names = TRUE)
+
+```
+
+```{r}
+# Forward primer (514F-Y) sequence
+FWD <- "GTGYCAGCMGCCGCGGTAA"
+
+# Reverse primer (8B5RB) sequence
+REV <- "GGACTACBVGGGTWTCTAAT"
+
+allOrients <- function(primer)
+  
+  require(Biostrings)
+dna <- DNAString(primer)
+orients <- c(Forward = dna, Complement = complement(dna), Reverse = reverse(dna),
+         RevComp = reverseComplement(dna))
+return(sapply(orients, toString))
+
+
+FWD.orients <- allOrients(FWD)
+REV.orients <- allOrients(REV)
+
+```
+
+```{r}
+glimpse(FWD.orients)
+
+```
+
+```{r}
+REV.orients
+```
+```{r}
+primerHits <- function(primer, fn) {
+  nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
+  return(sum(nhits > 0))}
+
+rbind(FWD.ForwardReads = sapply(list, function)(FWD.orients, primerHits, fn = fnFs[[1]]),
+      FWD.ReverseReads = sapply(list, function)(FWD.orients, primerHits, fn = fnRs[[1]]),
+      REV.ForwardReads = sapply(list, function)(REV.orients, primerHits, fn = fnFs[[1]]),
+      REV.ReverseReads = sapply(list, function)(ReV.orients, primerHits, fn = fnRs[[1]]))
+      
+      
+
+```
+
+```{r fig.height=10, fig.width=17}
+plotQualityProfile(fnFs[1:24])
+```
+```{r fig.height=10, fig.width=17}
+plotQualityProfile(fnRs[1:24])
+```
+```{r}
+sample.names <- sapply(strsplit(basename(fnFs), "_L")
+filt_path <- file.path(path, "filtered")
+
+filtF <- file.path(filt_path, paste0(sample.names, "_F_filt.fastq"))
+filtR <- file.path(filt_path, paste0(sample.names, "_R_filt.fastq"))
+
+```
+
+```{r}
+out <- filterAndTrim(fnFs, filtF, fnRs, filtR, truncLen = c(240,150), maxN = 0, maxEE = c(2,2), truncQ = 2, rm.phix = TRUE, compress = TRUE)
+
+readsinout <- out
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
